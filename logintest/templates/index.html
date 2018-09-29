@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script type="text/javascript">
+		var id_validation='false';
+        var pw_validation='false';
+
+		function check_id(){
+			var user_id=$("#user_id").val();
+
+			$.ajax({
+				url: '/check_id/',
+				data: {'user_id' : user_id},
+				dataType: 'json',
+				success: function(response_result) {
+					if(response_result.result=='true'){
+						$("#id_check_result").html("중복");
+						$("#id_check_result").css({
+							'color' : 'red',
+						});
+					}
+					else if(response_result.result=='false')
+					{
+						$("#id_check_result").html("사용가능");
+						$("#id_check_result").css({
+							'color' : 'green',
+						});
+                        id_validation='true';
+					}
+				}
+
+			})
+		}
+
+		function check_pw(){
+			var user_pw=$("#user_pw").val();
+			var user_pwc=$("#user_pwc").val();
+
+			if(user_pw!=user_pwc){
+				$("#pw_check_result").html("FAIL");
+				$("#pw_check_result").css({
+						'color' : 'red',
+				});
+			}else{
+				$("#pw_check_result").html("PASS");
+				$("#pw_check_result").css({
+						'color' : 'green',
+				});
+                pw_validation='true';
+			}
+		}
+
+		function check_submit(){
+		    if(id_validation=='true' && pw_validation=='true'){
+		        var form=document.form;
+		        form.submit();
+			}
+			else if(id_validation=='false' && pw_validation=='true'){
+			    alert("아이디를 확인해주세요");
+			}
+            else if(id_validation=='true' && pw_validation=='false'){
+                alert("비밀번호를 확인해주세요");
+            }
+            else{
+                alert("아이디, 비밀번호를 확인해주세요");
+            }
+		}
+	</script>
+</head>
+<body>
+<form method="POST" name="form" action="/register_member_db/">
+
+	{% csrf_token %}
+
+	ID : <input type="text" name="user_id" id="user_id">
+	<button type="button" onclick="check_id()">아이디 중복검사</button>
+	<br><br>
+	<p id="id_check_result"></p>
+	PASSWORD : <input type="PASSWORD" name="user_pw" id="user_pw"><br>
+	PASSWORD CONFIRM : <input type="PASSWORD" id="user_pwc" onchange="check_pw()"><br>
+	<p id="pw_check_result"></p>
+	<button type="button" onclick="check_submit()">submit</button>
+
+</form>
+</body>
+</html>
